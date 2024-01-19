@@ -25,7 +25,7 @@ public class CustomerContract {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    @ColumnDefault("'WAIT")
+    @ColumnDefault("'WAIT'")
     private CustomerContractStatus status;
 
     @Temporal(TemporalType.DATE)
