@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.bizplus.samplecustomer.domain.entity.QCustomer.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
 class CustomerTest {
@@ -32,4 +34,16 @@ class CustomerTest {
         // then
     }
 
+    @Test
+    @DisplayName("스태틱 qQlass")
+    void sdf() throws Exception {
+        // given
+        List<Customer> fetch = queryFactory.selectFrom(customer)
+                .fetch();
+        // when
+        Customer customer1 = fetch.get(0);
+        System.out.println(customer1.getFirstName());
+
+        // then
+    }
 }

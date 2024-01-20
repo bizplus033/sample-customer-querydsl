@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-
+/**
+ * 연동
+ * */
 @Entity
 @Table(name = "customer_kollus")
 @DynamicUpdate
