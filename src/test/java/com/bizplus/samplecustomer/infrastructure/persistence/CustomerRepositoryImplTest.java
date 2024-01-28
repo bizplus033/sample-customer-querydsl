@@ -9,6 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,6 +87,30 @@ class CustomerRepositoryImplTest {
         System.out.println(customerWithContractDtos.size());
         System.out.println(customerWithContractDtos1.size());
         System.out.println(customerWithContractDtos2.size());
+    }
+
+    @Test
+    void searchBy_Page() throws Exception {
+        // given
+        CustomerContractStatus status = CustomerContractStatus.WAIT;
+        CustomerContractPlan plan = CustomerContractPlan.BASIC;
+        Pageable pageable = PageRequest.of(0, 5); // 페이지 번호와 크기를 설정
+
+        // when
+        Page<CustomerWithContractDto> customerWithContractDtos = customerRepository.searchBy(status, plan, pageable);
+        int totalPages = customerWithContractDtos.getTotalPages();
+        long totalElements = customerWithContractDtos.getTotalElements();
+        List<CustomerWithContractDto> content = customerWithContractDtos.getContent();
+        int size = customerWithContractDtos.getSize();
+        int number = customerWithContractDtos.getNumber();
+
+
+        // then
+        System.out.println(totalPages);
+        System.out.println(totalElements);
+        System.out.println(size);
+        System.out.println(number);
+
     }
 
 }

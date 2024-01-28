@@ -1,6 +1,7 @@
 package com.bizplus.samplecustomer.infrastructure.persistence;
 
 import com.bizplus.samplecustomer.domain.dto.CustomerWithContractDto;
+import com.bizplus.samplecustomer.domain.dto.QCustomerWithContractDto;
 import com.bizplus.samplecustomer.domain.entity.Customer;
 import com.bizplus.samplecustomer.domain.repository.CustomerRepository;
 import com.bizplus.samplecustomer.domain.type.CustomerContractPlan;
@@ -12,6 +13,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,6 +86,26 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         return fetch;
     }
 
+    @Override
+    public Page<CustomerWithContractDto> searchBy(CustomerContractStatus status, CustomerContractPlan plan, Pageable pageable) {
+        BooleanBuilder booleanBuilder = toBooleanBuilder(status, plan);
+
+        List<CustomerWithContractDto> content = query.select(selectCustomerWithContract())
+                .from(customer)
+                .innerJoin(customerContract).on(customer.id.eq(customerContract.customerId))
+                .where(booleanBuilder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> count = query.select(customer.count())
+                .from(customer)
+                .innerJoin(customerContract).on(customer.id.eq(customerContract.customerId))
+                .where(booleanBuilder);
+
+        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
+    }
+
     private BooleanExpression eqCustomerContractStatus(CustomerContractStatus status) {
         return status != null ? customerContract.status.eq(status) : null;
     }
@@ -90,7 +114,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         return plan != null ? customerContract.plan.eq(plan) : null;
     }
     private ConstructorExpression<CustomerWithContractDto> selectCustomerWithContract() {
-        return Projections.constructor(CustomerWithContractDto.class,
+        return new QCustomerWithContractDto(
                 customer.id,
                 customer.companyName,
                 customer.firstName,
