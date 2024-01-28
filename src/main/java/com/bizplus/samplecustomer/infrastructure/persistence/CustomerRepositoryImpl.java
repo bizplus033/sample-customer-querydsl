@@ -13,6 +13,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,26 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 .where(booleanBuilder)
                 .fetch();
         return fetch;
+    }
+
+    @Override
+    public Page<CustomerWithContractDto> searchBy(CustomerContractStatus status, CustomerContractPlan plan, Pageable pageable) {
+        BooleanBuilder booleanBuilder = toBooleanBuilder(status, plan);
+
+        List<CustomerWithContractDto> content = query.select(selectCustomerWithContract())
+                .from(customer)
+                .innerJoin(customerContract).on(customer.id.eq(customerContract.customerId))
+                .where(booleanBuilder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> count = query.select(customer.count())
+                .from(customer)
+                .innerJoin(customerContract).on(customer.id.eq(customerContract.customerId))
+                .where(booleanBuilder);
+
+        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
     private BooleanExpression eqCustomerContractStatus(CustomerContractStatus status) {
