@@ -2,6 +2,7 @@ package com.bizplus.samplecustomer.domain.dto;
 
 import com.bizplus.samplecustomer.domain.type.CustomerContractPlan;
 import com.bizplus.samplecustomer.domain.type.CustomerContractStatus;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,7 +49,7 @@ public class CustomerWithContractDto {
             this.plan = plan;
         }
     }
-
+    @QueryProjection // 생성자도 Qclass 화 시킬 수 있다. 이 경우 런타임에러를 막을 수 있다. 이상한 파라미터를 방지
     public CustomerWithContractDto(Long id, String companyName, String firstName, String lastName, String phone,
                                    String email, String address, LocalDateTime createdAt, LocalDateTime updatedAt,
 

@@ -1,6 +1,7 @@
 package com.bizplus.samplecustomer.infrastructure.persistence;
 
 import com.bizplus.samplecustomer.domain.dto.CustomerWithContractDto;
+import com.bizplus.samplecustomer.domain.dto.QCustomerWithContractDto;
 import com.bizplus.samplecustomer.domain.entity.Customer;
 import com.bizplus.samplecustomer.domain.repository.CustomerRepository;
 import com.bizplus.samplecustomer.domain.type.CustomerContractPlan;
@@ -90,7 +91,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         return plan != null ? customerContract.plan.eq(plan) : null;
     }
     private ConstructorExpression<CustomerWithContractDto> selectCustomerWithContract() {
-        return Projections.constructor(CustomerWithContractDto.class,
+        return new QCustomerWithContractDto(
                 customer.id,
                 customer.companyName,
                 customer.firstName,
